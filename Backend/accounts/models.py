@@ -51,3 +51,16 @@ class Accounts(AbstractBaseUser):
 
     def has_module_perms(self, add_label):
         return True
+
+
+class ApplicationModel(models.Model):
+
+    app_name = models.CharField(max_length=120,unique=True)
+    app_link = models.CharField(max_length=200)
+    app_image = models.ImageField(upload_to='applicationImage')
+    app_category = models.CharField(max_length=120)
+    app_subcategory = models.CharField(max_length=120)
+    app_points = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.app_name
