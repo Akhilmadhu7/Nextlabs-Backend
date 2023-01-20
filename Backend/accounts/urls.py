@@ -4,6 +4,8 @@ from . views import *
 urlpatterns = [
     path('hello',Hello.as_view(),name='hello'),
     path('signup',SignupView.as_view(),name='signup'),
-    path('add-app',AddApplication.as_view(),name='add-app')
+    path('add-app',AddApplication.as_view(),name='add-app'),
+    path('list-apps',ListApplication.as_view(),name='list-apps'),
+    path('delete-app/<int:id>',delete_app,name='delete-app')
 
 ]

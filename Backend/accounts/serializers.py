@@ -61,8 +61,10 @@ class AccountSerializer(serializers.ModelSerializer):
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
-
+  
     class Meta:
         model = ApplicationModel
         fields = '__all__'
+       
+        
 

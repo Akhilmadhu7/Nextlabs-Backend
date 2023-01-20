@@ -1,7 +1,7 @@
 from django.contrib import admin
-from . models import Accounts,ApplicationModel
+from . models import Accounts, ApplicationModel
 
-# Register your models here.
+# # Register your models here.
 
 admin.site.register(Accounts)
 
