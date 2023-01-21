@@ -1,6 +1,8 @@
+import json
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import serializers
-from . models import Accounts, ApplicationModel
+from . models import Accounts, ApplicationModel,TaskModel
 import re
 
 
@@ -14,7 +16,6 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accounts
         fields = ['username','email','password','password2']
-
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, attrs):
@@ -66,5 +67,24 @@ class ApplicationSerializer(serializers.ModelSerializer):
         model = ApplicationModel
         fields = '__all__'
        
-        
 
+class TaskSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = TaskModel
+        fields = '__all__'
+
+
+class TaskCompletedSerialzier(serializers.ModelSerializer):
+
+    class Meta:
+        model = TaskModel
+        fields = '__all__'
+        depth = 1
+
+    
+
+      
+        
+    
+    

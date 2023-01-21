@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
-from . models import Accounts,ApplicationModel
-from . serializers import AccountSerializer, ApplicationSerializer
+from . models import Accounts,ApplicationModel,TaskModel
+from . serializers import AccountSerializer, ApplicationSerializer, TaskSerializer,TaskCompletedSerialzier
 from rest_framework import permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.generics import ListAPIView
@@ -53,7 +53,7 @@ class AddApplication(APIView):
             return Response(data,status=status.HTTP_201_CREATED)
         else:
             print('error is ',serializer.errors)
-            data['Response'] = serializer.errors
+            data['Error'] = serializer.errors
             return Response(data,status=status.HTTP_400_BAD_REQUEST)
           
 
@@ -75,3 +75,50 @@ def delete_app(request,id):
     app.delete()
     data['Response'] = 'Application deleted Succesfully'
     return Response(data,status=status.HTTP_200_OK) 
+
+
+#user profile fucntion.
+class UserProfile(APIView):
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self,request):
+        data = {}
+        user = request.user.id #getting user from the request data
+        print('here is user',user)
+        try:
+            accounts = Accounts.objects.get(id=user)
+        except:
+            data['Response'] = 'Account does not exist'
+            return Response(data, status=status.HTTP_404_NOT_FOUND)   
+        if accounts:
+            serializer = AccountSerializer(accounts)
+            data['Response'] = serializer.data
+            return Response(data,status=status.HTTP_200_OK) 
+
+
+class TaskComplete(APIView):
+
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (MultiPartParser,FormParser)
+
+    def post(self,request):
+        data = {}
+        print('here is data',request.data)
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data['Response'] = 'Application downloaded'
+            return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            data['Response'] = serializer.errors
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)   
+
+    def get(self,request):
+        user = request.user.id
+        tsk = TaskModel.objects.filter(user = user)
+        data = {}
+        ser = TaskCompletedSerialzier(tsk,many=True,context={'request':request})
+        data['Res'] = ser.data
+        return Response(data,status=status.HTTP_200_OK)
+        

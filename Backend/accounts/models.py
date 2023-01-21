@@ -32,6 +32,8 @@ class Accounts(AbstractBaseUser):
     username = models.CharField(max_length=120,unique=True)
     email = models.EmailField(max_length=200,unique=True)
     profile_pic = models.ImageField(upload_to='profileImage',null=True,blank=True)
+    user_points = models.CharField(max_length=120,default=0)
+
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -65,3 +67,13 @@ class ApplicationModel(models.Model):
 
     def __str__(self):
         return self.app_name
+
+
+class TaskModel(models.Model):
+
+    application = models.ForeignKey(ApplicationModel,related_name='application_name',on_delete=models.CASCADE)
+    user = models.ForeignKey(Accounts,related_name='user_name',on_delete=models.CASCADE)
+    task_image = models.ImageField(upload_to='taskImage',null=True,blank=True)
+
+    def __str__(self):
+        return self.application.app_name
