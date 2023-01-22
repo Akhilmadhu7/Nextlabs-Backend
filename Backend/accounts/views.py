@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
+from django.db.models import Q
 from rest_framework import status
 from . models import Accounts,ApplicationModel,TaskModel
 from . serializers import AccountSerializer, ApplicationSerializer, TaskSerializer,TaskCompletedSerialzier
@@ -54,7 +55,7 @@ class AddApplication(APIView):
         else:
             print('error is ',serializer.errors)
             data['Error'] = serializer.errors
-            return Response(data,status=status.HTTP_400_BAD_REQUEST)
+            return Response(data,status=status.HTTP_400_BAD_REQUEST)      
           
 
 #List all the application on admin side.
@@ -105,14 +106,31 @@ class TaskComplete(APIView):
     def post(self,request):
         data = {}
         print('here is data',request.data)
-        serializer = TaskSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            data['Response'] = 'Application downloaded'
-            return Response(data,status=status.HTTP_201_CREATED)
-        else:
-            data['Response'] = serializer.errors
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)   
+        try:
+            task = TaskModel.objects.get(Q(application=self.request.data['application']) & Q(user=self.request.data['user']))
+            print('taskkkkk',task)
+        except:
+            print('helksad')
+            task = None
+
+        if task is None:
+            serializer = TaskSerializer(data=request.data)
+            if serializer.is_valid():
+                print('serialiae')
+                serializer.save()
+                user = Accounts.objects.get(id=request.user.id)
+                user.user_points = int(user.user_points) + 100
+                user.save()
+                print('userpoints',user.user_points)
+                data['Response'] = 'Application downloaded'
+                return Response(data,status=status.HTTP_201_CREATED)
+            else:
+                data['Response'] = serializer.errors
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        else:   
+            data['Response'] = 'Task already completed'
+            return Response(data, status=status.HTTP_208_ALREADY_REPORTED)      
+             
 
     def get(self,request):
         user = request.user.id
@@ -122,3 +140,21 @@ class TaskComplete(APIView):
         data['Res'] = ser.data
         return Response(data,status=status.HTTP_200_OK)
         
+#to show the detail of an app.
+class AppDetailsView(APIView):
+    
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self,request,id):
+        data = {}
+        try:
+            app = ApplicationModel.objects.get(id=id)
+        except:
+            data['Response'] = 'Something went wrong'
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+        if app:
+            serializer = ApplicationSerializer(app,context={'request':request})
+            data['Response'] = serializer.data
+            return Response(data,status=status.HTTP_200_OK)
+
+                

@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import serializers
 from . models import Accounts, ApplicationModel,TaskModel
+from django.db.models import Q
 import re
 
 
@@ -15,7 +16,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Accounts
-        fields = ['username','email','password','password2']
+        fields = ['username','email','password','password2','user_points']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, attrs):
@@ -73,6 +74,14 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskModel
         fields = '__all__'
+
+    # def validate(self, attrs):
+    #     self.application = attrs['application']
+    #     print('adlk',self.application)
+    #     self.user = attrs['user']
+    #     task = TaskModel.objects.get(Q(application=self.application) & Q(user=self.user))     
+    #     if task is not None:
+    #         raise serializers.ValidationError({'Task':"Task completed already"})
 
 
 class TaskCompletedSerialzier(serializers.ModelSerializer):
