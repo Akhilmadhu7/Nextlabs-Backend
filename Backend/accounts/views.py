@@ -13,14 +13,6 @@ from rest_framework.generics import ListAPIView
 
 # Create your views here.
 
-class Hello(APIView):
-
-    def get(self,request):
-        data = {}
-        data['a'] = 'hello'
-
-        return Response(data,status=status.HTTP_200_OK)
-
 
 #Signup function
 class SignupView(APIView):

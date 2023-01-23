@@ -62,6 +62,7 @@ class AccountSerializer(serializers.ModelSerializer):
         return register
 
 
+#ApplicationModel serializer
 class ApplicationSerializer(serializers.ModelSerializer):
   
     class Meta:
@@ -74,14 +75,6 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskModel
         fields = '__all__'
-
-    # def validate(self, attrs):
-    #     self.application = attrs['application']
-    #     print('adlk',self.application)
-    #     self.user = attrs['user']
-    #     task = TaskModel.objects.get(Q(application=self.application) & Q(user=self.user))     
-    #     if task is not None:
-    #         raise serializers.ValidationError({'Task':"Task completed already"})
 
 
 class TaskCompletedSerialzier(serializers.ModelSerializer):
